@@ -1,7 +1,7 @@
 require 'puppet/indirector/face'
 Puppet::Face.define(:workstation, '1.0.0') do
   copyright "Puppet Labs", 2015
-  license   "Commercial"
+  license   "Puppet Enterprise Software License Agreement"
 
   summary "Manage configuration of the local system."
   description <<-'EOT'
