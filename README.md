@@ -4,13 +4,12 @@ This module provides a new Puppet command, `puppet workstation`.
 
 ## Examples ##
 
-    puppet workstation enable
-    puppet workstation configure
+    puppet workstation-environment add --source <uri> --name <name> [--workstation-environmentpath <path>]
+    puppet workstation-environment delete --name <name> [--workstation-environmentpath <path>]
+    puppet workstation-environment list [--workstation-environmentpath <path>]
+    puppet workstation configure [--workstation-environment <environment>] [--workstation-config <path>] [--workstation-environmentpath <path>]
 
-## Directory structure
-
-    --environmentpath
-    --environment
+## Directory structure ##
 
     $codedir/
     |-- environments/
@@ -25,8 +24,9 @@ This module provides a new Puppet command, `puppet workstation`.
     `-- workstation/                 # $workstation_confdir
         `-- workstation.conf         # $workstation_config
 
+## Configuration File ##
 
-    # workstation.conf
+    # workstation.conf (hocon)
     classes: [
       "git",
       "caffeine",
