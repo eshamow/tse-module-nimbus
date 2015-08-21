@@ -1,5 +1,10 @@
 require 'puppet/indirector/face'
+require 'puppet_x/workstation/config'
+require 'puppet/application/apply'
+require 'puppet/util/command_line'
+
 Puppet::Face.define(:workstation, '1.0.0') do
+
   copyright "Puppet Labs", 2015
   license   "Puppet Enterprise Software License Agreement"
 
@@ -9,24 +14,24 @@ Puppet::Face.define(:workstation, '1.0.0') do
     standalone Puppet environment.
   EOT
 
-  option('--workstation-confdir <path>') do |arg|
-    default_to { nil }
-    summary "the workstation_confdir value to use"
+  option('--workstation-environment <environment>') do |arg|
+    default_to { 'default' }
+    summary "the workstation_environment value to use"
   end
-  
-  option('--workstation-config <path>') do |arg|
-    default_to { nil }
-    summary "the workstation_config value to use"
-  end
-  
+
   option('--workstation-environmentpath <path>') do |arg|
-    default_to { nil }
+    default_to { File.join(Puppet[:codedir], 'workstation_environments') }
     summary "the workstation_environmentpath value to use"
   end
-  
-  option('--workstation-environment <environment>') do |arg|
-    default_to { nil }
-    summary "the workstation_environment value to use"
+
+  option('--workstation-confdir <path>') do |arg|
+    default_to { File.join(Puppet[:confdir], 'workstation') }
+    summary "the workstation_confdir value to use"
+  end
+
+  option('--workstation-config <path>') do |arg|
+    default_to { File.join(Puppet[:confdir], 'workstation', 'default.conf') }
+    summary "the workstation_config value to use"
   end
 
   action :help do
@@ -40,14 +45,28 @@ Puppet::Face.define(:workstation, '1.0.0') do
   action :configure do
     summary "Configure the local system using Puppet."
     when_invoked do |options|
-      raise "not implemented"
+      set_global_config(options)
+      Puppet[:node_terminus] = 'workstation'
+      Puppet[:data_binding_terminus] = 'workstation'
+      argv = [ ]
+      apply = Puppet::Application::Apply.new(Puppet::Util::CommandLine.new($0, argv))
+      apply.run_command
     end
   end
 
   action :get do
     summary "Retrieve and install a workstation configuration file."
     when_invoked do |options|
+      set_global_config(options)
       raise "not implemented"
     end
   end
+
+  def set_global_config(options)
+    PuppetX::Workstation::Config.environment = options[:workstation_environment]
+    PuppetX::Workstation::Config.environmentpath = options[:workstation_environmentpath]
+    PuppetX::Workstation::Config.confdir = options[:workstation_confdir]
+    PuppetX::Workstation::Config.config = options[:workstation_config]
+  end
+
 end
