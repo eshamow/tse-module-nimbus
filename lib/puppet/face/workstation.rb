@@ -44,8 +44,8 @@ Puppet::Face.define(:workstation, '1.0.0') do
     end
   end
 
-  action :enable do
-    summary "Subject to change. Enable a given environment for configuration."
+  action :get do
+    summary "Retrieve and install a workstation configuration file."
     when_invoked do |options|
       raise "not implemented"
     end
