@@ -30,11 +30,6 @@ Puppet::Face.define(:workstation, '1.0.0') do
     summary "the workstation_confdir value to use"
   end
 
-  option('--workstation-config <path>') do |arg|
-    default_to { File.join(Puppet[:confdir], 'workstation', 'default.conf') }
-    summary "the workstation_config value to use"
-  end
-
   action :help do
     default
     summary "Display help about the workstation subcommand."
@@ -71,7 +66,6 @@ Puppet::Face.define(:workstation, '1.0.0') do
     PuppetX::Workstation::Config.environment = options[:workstation_environment]
     PuppetX::Workstation::Config.environmentpath = options[:workstation_environmentpath]
     PuppetX::Workstation::Config.confdir = options[:workstation_confdir]
-    PuppetX::Workstation::Config.config = options[:workstation_config]
 
     # Make a best-effort to create the working directories if they don't
     # already exist. Note the use of mkdir instead of mkdir_p; this will only
@@ -79,6 +73,9 @@ Puppet::Face.define(:workstation, '1.0.0') do
     [:workstation_environmentpath, :workstation_confdir].each do |dir|
       FileUtils.mkdir(options[dir]) unless File.exist?(options[dir])
     end
+
+    # Load config, if there is any
+    PuppetX::Workstation::Config.parse_config!
   end
 
 end
