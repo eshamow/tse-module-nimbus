@@ -2,6 +2,7 @@ require 'puppet/indirector/face'
 require 'puppet_x/workstation/config'
 require 'puppet/application/apply'
 require 'puppet/util/command_line'
+require 'fileutils'
 
 Puppet::Face.define(:workstation, '1.0.0') do
 
@@ -48,8 +49,12 @@ Puppet::Face.define(:workstation, '1.0.0') do
       set_global_config(options)
       Puppet[:node_terminus] = 'workstation'
       Puppet[:data_binding_terminus] = 'workstation'
-      argv = [ ]
-      apply = Puppet::Application::Apply.new(Puppet::Util::CommandLine.new($0, argv))
+      argv = [
+        '--execute', '',
+      ]
+      command_line = Puppet::Util::CommandLine.new('puppet', argv)
+      apply = Puppet::Application::Apply.new(command_line)
+      apply.parse_options
       apply.run_command
     end
   end
@@ -67,6 +72,13 @@ Puppet::Face.define(:workstation, '1.0.0') do
     PuppetX::Workstation::Config.environmentpath = options[:workstation_environmentpath]
     PuppetX::Workstation::Config.confdir = options[:workstation_confdir]
     PuppetX::Workstation::Config.config = options[:workstation_config]
+
+    # Make a best-effort to create the working directories if they don't
+    # already exist. Note the use of mkdir instead of mkdir_p; this will only
+    # work if the parent directories already exist.
+    [:workstation_environmentpath, :workstation_confdir].each do |dir|
+      FileUtils.mkdir(options[dir]) unless File.exist?(options[dir])
+    end
   end
 
 end
