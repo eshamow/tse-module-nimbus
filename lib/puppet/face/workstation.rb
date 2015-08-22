@@ -44,13 +44,21 @@ Puppet::Face.define(:workstation, '1.0.0') do
       set_global_config(options)
       Puppet[:node_terminus] = 'workstation'
       Puppet[:data_binding_terminus] = 'workstation'
-      argv = [
-        '--execute', '',
-      ]
-      command_line = Puppet::Util::CommandLine.new('puppet', argv)
-      apply = Puppet::Application::Apply.new(command_line)
-      apply.parse_options
-      apply.run_command
+      Puppet[:environmentpath] = options[:workstation_environmentpath]
+      Puppet[:environment] = options[:workstation_environment]
+
+      loader = Puppet::Environments::Directories.new(
+        Puppet[:environmentpath],
+        Puppet[:basemodulepath].split(':')
+      )
+
+      Puppet.override(:environments => loader) do
+        argv = ['--execute', '']
+        command_line = Puppet::Util::CommandLine.new('puppet', argv)
+        apply = Puppet::Application::Apply.new(command_line)
+        apply.parse_options
+        apply.run_command
+      end
     end
   end
 
@@ -70,8 +78,11 @@ Puppet::Face.define(:workstation, '1.0.0') do
     # Make a best-effort to create the working directories if they don't
     # already exist. Note the use of mkdir instead of mkdir_p; this will only
     # work if the parent directories already exist.
-    [:workstation_environmentpath, :workstation_confdir].each do |dir|
-      FileUtils.mkdir(options[dir]) unless File.exist?(options[dir])
+    [ options[:workstation_environmentpath],
+      options[:workstation_confdir],
+      File.join(options[:workstation_environmentpath], options[:workstation_environment]),
+    ].each do |dir|
+      FileUtils.mkdir(dir) unless File.exist?(dir)
     end
 
     # Load config, if there is any
