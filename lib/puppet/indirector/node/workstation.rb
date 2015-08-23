@@ -6,7 +6,7 @@ class Puppet::Node::Workstation < Puppet::Indirector::Plain
 
   def find(request)
     node = Puppet::Node.new(request.key)
-    node.classes = PuppetX::Workstation::Config.config[:classes]
+    node.classes = PuppetX::Workstation::Config[:classes]
     node.fact_merge
     node
   end

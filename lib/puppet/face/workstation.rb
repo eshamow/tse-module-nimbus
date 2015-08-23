@@ -30,6 +30,11 @@ Puppet::Face.define(:workstation, '1.0.0') do
     summary "the workstation_confdir value to use"
   end
 
+  option('--workstation-config <path>') do |arg|
+    default_to { nil }
+    summary "a specific configuration file to use"
+  end
+
   action :help do
     default
     summary "Display help about the workstation subcommand."
@@ -38,21 +43,52 @@ Puppet::Face.define(:workstation, '1.0.0') do
     end
   end
 
+  action :modules do
+    summary "Manage workstation modules."
+    when_invoked do |command, options|
+      workstation_context(options) do
+        case command
+        when "install"
+          modules = PuppetX::Workstation::Config[:modules]
+          modules.each do |key,value|
+            install = Puppet::Face[:module, '1.0.0'].install(key,
+              :environment => options[:workstation_environment],
+              :ignore_dependencies => true,
+              :force => true,
+              :version => value['version']
+            )
+            if install[:result] == :failure
+              raise install[:error][:multiline]
+            else
+              puts "Notice: Installed #{key} (#{value['version']})"
+            end
+          end
+        when "list"
+          Puppet::Face[:module, '1.0.0'].list(:environment => options[:workstation_environment])
+        else
+          raise 'specify either "list" or "install".'
+        end
+      end
+    end
+
+    when_rendering :console do |result, command, options|
+      case command
+      when "list"
+        # TODO: do a custom render. For now I'm just hijacking the render
+        # method from the module face. This is, of course, terrible.
+        Puppet::Face[:module, '1.0.0'].get_action(:list).instance_variable_get(:@when_rendering)[:console].bind(Puppet::Face[:module, '1.0.0']).call(result, {})
+      when "install"
+        ""
+      else
+        result
+      end
+    end
+  end
+
   action :configure do
     summary "Configure the local system using Puppet."
     when_invoked do |options|
-      set_global_config(options)
-      Puppet[:node_terminus] = 'workstation'
-      Puppet[:data_binding_terminus] = 'workstation'
-      Puppet[:environmentpath] = options[:workstation_environmentpath]
-      Puppet[:environment] = options[:workstation_environment]
-
-      loader = Puppet::Environments::Directories.new(
-        Puppet[:environmentpath],
-        Puppet[:basemodulepath].split(':')
-      )
-
-      Puppet.override(:environments => loader) do
+      workstation_context(options) do
         argv = ['--execute', '']
         command_line = Puppet::Util::CommandLine.new('puppet', argv)
         apply = Puppet::Application::Apply.new(command_line)
@@ -64,9 +100,27 @@ Puppet::Face.define(:workstation, '1.0.0') do
 
   action :get do
     summary "Retrieve and install a workstation configuration file."
-    when_invoked do |options|
+    arguments "<uri>"
+    when_invoked do |uri, options|
       set_global_config(options)
-      raise "not implemented"
+      raise ":get action not implemented"
+    end
+  end
+
+  def workstation_context(options, &block)
+    set_global_config(options)
+    Puppet[:node_terminus] = 'workstation'
+    Puppet[:data_binding_terminus] = 'workstation'
+    Puppet[:environmentpath] = options[:workstation_environmentpath]
+    Puppet[:environment] = options[:workstation_environment]
+
+    loader = Puppet::Environments::Directories.new(
+      Puppet[:environmentpath],
+      Puppet[:basemodulepath].split(':')
+    )
+
+    Puppet.override(:environments => loader) do
+      block.call
     end
   end
 
@@ -74,6 +128,7 @@ Puppet::Face.define(:workstation, '1.0.0') do
     PuppetX::Workstation::Config.environment = options[:workstation_environment]
     PuppetX::Workstation::Config.environmentpath = options[:workstation_environmentpath]
     PuppetX::Workstation::Config.confdir = options[:workstation_confdir]
+    PuppetX::Workstation::Config.config = options[:workstation_config]
 
     # Make a best-effort to create the working directories if they don't
     # already exist. Note the use of mkdir instead of mkdir_p; this will only

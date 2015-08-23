@@ -9,7 +9,7 @@ class Puppet::DataBinding::Workstation < Puppet::Indirector::Plain
   end
 
   def data
-    @data ||= PuppetX::Workstation::Config.config[:data]
+    @data ||= PuppetX::Workstation::Config[:data]
   end
 
 end
