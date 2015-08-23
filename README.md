@@ -1,18 +1,18 @@
-# Workstation #
+# Localhost #
 
-This module provides a new Puppet command, `puppet workstation`.
+This module provides a new Puppet command, `puppet localhost`.
 
-When `puppet workstation configure` is run, Puppet will set the runtime
-$environmentpath to $workstation_environmentpath, set the runtime $environment
-to $workstation_environment, and read $workstation_config. A custom node
+When `puppet localhost configure` is run, Puppet will set the runtime
+$environmentpath to $localhost_environmentpath, set the runtime $environment
+to $localhost_environment, and read $localhost_config. A custom node
 terminus will be switched to that reads classes from the `classes` config key.
 A custom data terminus will be used to bind data from the `data` config key.
-The $workstation_environment will be populated to match the modules defined in
+The $localhost_environment will be populated to match the modules defined in
 the `modules` config key. With this configuration primed, Puppet will be run.
 
 The end result is that users may define a single text file that lists all the
 modules they want, the data they want, and the classes they want applied to
-their local machine. They may then use the `puppet workstation` command to
+their local machine. They may then use the `puppet localhost` command to
 easily puppetize their system from that input.
 
 Note that alternatively, a confdir may be specified, in which case all .conf
@@ -23,19 +23,19 @@ file.
 
 New users can get started with a config provided by their company or team.
 
-    puppet module install tse/workstation
-    puppet workstation get http://company.com/puppet-workstation.conf
-    puppet workstation configure
+    puppet module install tse/localhost
+    puppet localhost get http://company.com/puppet-localhost.conf
+    puppet localhost configure
 
 ## Examples ##
 
 Assume that the Puppet AIO package has just been installed and nothing else.
-This is an example of bootstrapping a workstation configuration. Try it!
+This is an example of bootstrapping a localhost configuration. Try it!
 
-    puppet module install tse/workstation
+    puppet module install tse/localhost
     curl -Lo example.conf http://git.io/vswiI
-    puppet workstation --workstation-config=example.conf modules install
-    puppet workstation --workstation-config=example.conf configure
+    puppet localhost --localhost-config=example.conf modules install
+    puppet localhost --localhost-config=example.conf configure
 
 Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
 necessary to update root CA bundles used by Puppet to get the module tool
@@ -52,20 +52,20 @@ Forge will work.
 
     $codedir/
     |-- environments/
-    `-- workstation_environments/    # $workstation_environmentpath
-        `-- default                  # $workstation_environment
+    `-- localhost_environments/    # $localhost_environmentpath
+        `-- default                  # $localhost_environment
             |-- manifests/
             |   `-- site.pp
             |-- modules/
             `-- hieradata/
 
     $confdir/
-    `-- workstation/               # $workstation_confdir
-        `-- workstation.conf         # $workstation_config
+    `-- localhost/               # $localhost_confdir
+        `-- localhost.conf         # $localhost_config
 
 ## Configuration File ##
 
-    # workstation.conf (hocon)
+    # localhost.conf (hocon)
     classes: [
       "git",
       "caffeine",
@@ -88,6 +88,6 @@ Forge will work.
 
 ## Old Ideas ##
 
-    puppet workstation-environment add --source <uri> --name <name> [--workstation-environmentpath <path>]
-    puppet workstation-environment delete --name <name> [--workstation-environmentpath <path>]
-    puppet workstation-environment list [--workstation-environmentpath <path>]
+    puppet localhost-environment add --source <uri> --name <name> [--localhost-environmentpath <path>]
+    puppet localhost-environment delete --name <name> [--localhost-environmentpath <path>]
+    puppet localhost-environment list [--localhost-environmentpath <path>]

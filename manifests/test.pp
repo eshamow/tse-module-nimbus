@@ -1,4 +1,4 @@
-class workstation::test (
+class localhost::test (
   $arg1 = undef,
   $arg2 = undef,
   $arg3 = undef,
@@ -10,5 +10,5 @@ class workstation::test (
     }
   }
 
-  notify { 'workstation::test': }
+  notify { 'localhost::test': }
 }

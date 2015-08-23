@@ -1,10 +1,10 @@
 require 'puppet/indirector/face'
-require 'puppet_x/workstation/config'
+require 'puppet_x/localhost/config'
 require 'puppet/application/apply'
 require 'puppet/util/command_line'
 require 'fileutils'
 
-Puppet::Face.define(:workstation, '1.0.0') do
+Puppet::Face.define(:localhost, '1.0.0') do
 
   copyright "Puppet Labs", 2015
   license   "Puppet Enterprise Software License Agreement"
@@ -15,44 +15,44 @@ Puppet::Face.define(:workstation, '1.0.0') do
     standalone Puppet environment.
   EOT
 
-  option('--workstation-environment <environment>') do |arg|
+  option('--localhost-environment <environment>') do |arg|
     default_to { 'default' }
-    summary "the workstation_environment value to use"
+    summary "the localhost_environment value to use"
   end
 
-  option('--workstation-environmentpath <path>') do |arg|
-    default_to { File.join(Puppet[:codedir], 'workstation_environments') }
-    summary "the workstation_environmentpath value to use"
+  option('--localhost-environmentpath <path>') do |arg|
+    default_to { File.join(Puppet[:codedir], 'localhost_environments') }
+    summary "the localhost_environmentpath value to use"
   end
 
-  option('--workstation-confdir <path>') do |arg|
-    default_to { File.join(Puppet[:confdir], 'workstation') }
-    summary "the workstation_confdir value to use"
+  option('--localhost-confdir <path>') do |arg|
+    default_to { File.join(Puppet[:confdir], 'localhost') }
+    summary "the localhost_confdir value to use"
   end
 
-  option('--workstation-config <path>') do |arg|
+  option('--localhost-config <path>') do |arg|
     default_to { nil }
     summary "a specific configuration file to use"
   end
 
   action :help do
     default
-    summary "Display help about the workstation subcommand."
+    summary "Display help about the localhost subcommand."
     when_invoked do |*args|
-      Puppet::Face[:help, '0.0.1'].help('workstation')
+      Puppet::Face[:help, '0.0.1'].help('localhost')
     end
   end
 
   action :modules do
-    summary "Manage workstation modules."
+    summary "Manage localhost modules."
     when_invoked do |command, options|
-      workstation_context(options) do
+      localhost_context(options) do
         case command
         when "install"
-          modules = PuppetX::Workstation::Config[:modules]
+          modules = PuppetX::Localhost::Config[:modules]
           modules.each do |key,value|
             install = Puppet::Face[:module, '1.0.0'].install(key,
-              :environment => options[:workstation_environment],
+              :environment => options[:localhost_environment],
               :ignore_dependencies => true,
               :force => true,
               :version => value['version']
@@ -64,7 +64,7 @@ Puppet::Face.define(:workstation, '1.0.0') do
             end
           end
         when "list"
-          Puppet::Face[:module, '1.0.0'].list(:environment => options[:workstation_environment])
+          Puppet::Face[:module, '1.0.0'].list(:environment => options[:localhost_environment])
         else
           raise 'specify either "list" or "install".'
         end
@@ -88,7 +88,7 @@ Puppet::Face.define(:workstation, '1.0.0') do
   action :configure do
     summary "Configure the local system using Puppet."
     when_invoked do |options|
-      workstation_context(options) do
+      localhost_context(options) do
         argv = ['--execute', '']
         command_line = Puppet::Util::CommandLine.new('puppet', argv)
         apply = Puppet::Application::Apply.new(command_line)
@@ -99,7 +99,7 @@ Puppet::Face.define(:workstation, '1.0.0') do
   end
 
   action :get do
-    summary "Retrieve and install a workstation configuration file."
+    summary "Retrieve and install a localhost configuration file."
     arguments "<uri>"
     when_invoked do |uri, options|
       set_global_config(options)
@@ -107,12 +107,12 @@ Puppet::Face.define(:workstation, '1.0.0') do
     end
   end
 
-  def workstation_context(options, &block)
+  def localhost_context(options, &block)
     set_global_config(options)
-    Puppet[:node_terminus] = 'workstation'
-    Puppet[:data_binding_terminus] = 'workstation'
-    Puppet[:environmentpath] = options[:workstation_environmentpath]
-    Puppet[:environment] = options[:workstation_environment]
+    Puppet[:node_terminus] = 'localhost'
+    Puppet[:data_binding_terminus] = 'localhost'
+    Puppet[:environmentpath] = options[:localhost_environmentpath]
+    Puppet[:environment] = options[:localhost_environment]
 
     loader = Puppet::Environments::Directories.new(
       Puppet[:environmentpath],
@@ -125,23 +125,23 @@ Puppet::Face.define(:workstation, '1.0.0') do
   end
 
   def set_global_config(options)
-    PuppetX::Workstation::Config.environment = options[:workstation_environment]
-    PuppetX::Workstation::Config.environmentpath = options[:workstation_environmentpath]
-    PuppetX::Workstation::Config.confdir = options[:workstation_confdir]
-    PuppetX::Workstation::Config.config = options[:workstation_config]
+    PuppetX::Localhost::Config.environment = options[:localhost_environment]
+    PuppetX::Localhost::Config.environmentpath = options[:localhost_environmentpath]
+    PuppetX::Localhost::Config.confdir = options[:localhost_confdir]
+    PuppetX::Localhost::Config.config = options[:localhost_config]
 
     # Make a best-effort to create the working directories if they don't
     # already exist. Note the use of mkdir instead of mkdir_p; this will only
     # work if the parent directories already exist.
-    [ options[:workstation_environmentpath],
-      options[:workstation_confdir],
-      File.join(options[:workstation_environmentpath], options[:workstation_environment]),
+    [ options[:localhost_environmentpath],
+      options[:localhost_confdir],
+      File.join(options[:localhost_environmentpath], options[:localhost_environment]),
     ].each do |dir|
       FileUtils.mkdir(dir) unless File.exist?(dir)
     end
 
     # Load config, if there is any
-    PuppetX::Workstation::Config.parse_config!
+    PuppetX::Localhost::Config.parse_config!
   end
 
 end

@@ -2,7 +2,7 @@ require 'singleton'
 require 'hocon'
 
 module PuppetX
-  module Workstation
+  module Localhost
     class Config
       include Singleton
 
