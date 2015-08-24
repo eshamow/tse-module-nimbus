@@ -88,6 +88,32 @@ Forge will work.
       }
     }
 
+## Options ##
+
+### `--singleton-config <path>` ###
+
+The path to a Hocon configuration file specifying classes, data, and/or modules
+to use in singleton configuration.
+
+### `--singleton-confdir <path>` ###
+
+The path to a directory containing one or more `*.conf` Hocon configuration
+files, each of which may specify classes, data, or modules. All the `*.conf`
+files in this directory will be read, merged, and the result used in singleton
+configuration.
+
+### `--singleton-environment <name>` ###
+
+Puppet singleton uses environments just like Puppet. This flag sets the name of
+the environment the run will use.
+
+### `--singleton-environmentpath <path>` ###
+
+Puppet singleton typically uses a subcommand-specific environmentpath. This
+flag allows you to set the path used explicitly. It may be useful if you have
+manually installed modules or created an environment you want the command to
+use.
+
 ## Old Ideas ##
 
     puppet singleton-environment add --source <uri> --name <name> [--singleton-environmentpath <path>]
