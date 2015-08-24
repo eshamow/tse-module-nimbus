@@ -23,10 +23,6 @@ file.
 
 New users can get started with a config provided by their company or team.
 
-    puppet module install tse/singleton
-    puppet singleton get http://company.com/puppet-singleton.conf
-    puppet singleton configure
-
 ## Examples ##
 
 Assume that the Puppet AIO package has just been installed and nothing else.
