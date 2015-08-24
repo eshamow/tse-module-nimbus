@@ -1,8 +1,8 @@
 {
-  "name": "tse-localhost",
+  "name": "tse-singleton",
   "version": "0.0.1",
   "author": "Puppet Labs TSE Team",
-  "summary": "Boxen-inspired personal localhost configuration utility",
+  "summary": "Boxen-inspired personal singleton configuration utility",
   "source": "",
   "license": "Apache-2.0",
   "dependencies": [

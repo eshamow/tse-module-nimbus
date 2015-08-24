@@ -1,4 +1,4 @@
-class localhost::test (
+class singleton::test (
   $arg1 = undef,
   $arg2 = undef,
   $arg3 = undef,
@@ -10,5 +10,5 @@ class localhost::test (
     }
   }
 
-  notify { 'localhost::test': }
+  notify { 'singleton::test': }
 }

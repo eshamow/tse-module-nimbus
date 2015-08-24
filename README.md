@@ -1,18 +1,18 @@
-# Localhost #
+# Singleton #
 
-This module provides a new Puppet command, `puppet localhost`.
+This module provides a new Puppet command, `puppet singleton`.
 
-When `puppet localhost configure` is run, Puppet will set the runtime
-$environmentpath to $localhost_environmentpath, set the runtime $environment
-to $localhost_environment, and read $localhost_config. A custom node
+When `puppet singleton configure` is run, Puppet will set the runtime
+$environmentpath to $singleton_environmentpath, set the runtime $environment
+to $singleton_environment, and read $singleton_config. A custom node
 terminus will be switched to that reads classes from the `classes` config key.
 A custom data terminus will be used to bind data from the `data` config key.
-The $localhost_environment will be populated to match the modules defined in
+The $singleton_environment will be populated to match the modules defined in
 the `modules` config key. With this configuration primed, Puppet will be run.
 
 The end result is that users may define a single text file that lists all the
 modules they want, the data they want, and the classes they want applied to
-their local machine. They may then use the `puppet localhost` command to
+their local machine. They may then use the `puppet singleton` command to
 easily puppetize their system from that input.
 
 Note that alternatively, a confdir may be specified, in which case all .conf
@@ -23,19 +23,19 @@ file.
 
 New users can get started with a config provided by their company or team.
 
-    puppet module install tse/localhost
-    puppet localhost get http://company.com/puppet-localhost.conf
-    puppet localhost configure
+    puppet module install tse/singleton
+    puppet singleton get http://company.com/puppet-singleton.conf
+    puppet singleton configure
 
 ## Examples ##
 
 Assume that the Puppet AIO package has just been installed and nothing else.
-This is an example of bootstrapping a localhost configuration. Try it!
+This is an example of bootstrapping a singleton configuration. Try it!
 
-    puppet module install tse/localhost
+    puppet module install tse/singleton
     curl -Lo example.conf http://git.io/vswiI
-    puppet localhost --localhost-config=example.conf modules install
-    puppet localhost --localhost-config=example.conf configure
+    puppet singleton --singleton-config=example.conf modules install
+    puppet singleton --singleton-config=example.conf configure
 
 Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
 necessary to update root CA bundles used by Puppet to get the module tool
@@ -52,20 +52,20 @@ Forge will work.
 
     $codedir/
     |-- environments/
-    `-- localhost_environments/    # $localhost_environmentpath
-        `-- default                  # $localhost_environment
+    `-- singleton_environments/    # $singleton_environmentpath
+        `-- default                  # $singleton_environment
             |-- manifests/
             |   `-- site.pp
             |-- modules/
             `-- hieradata/
 
     $confdir/
-    `-- localhost/               # $localhost_confdir
-        `-- localhost.conf         # $localhost_config
+    `-- singleton/               # $singleton_confdir
+        `-- singleton.conf         # $singleton_config
 
 ## Configuration File ##
 
-    # localhost.conf (hocon)
+    # singleton.conf (hocon)
     classes: [
       "git",
       "caffeine",
@@ -88,6 +88,6 @@ Forge will work.
 
 ## Old Ideas ##
 
-    puppet localhost-environment add --source <uri> --name <name> [--localhost-environmentpath <path>]
-    puppet localhost-environment delete --name <name> [--localhost-environmentpath <path>]
-    puppet localhost-environment list [--localhost-environmentpath <path>]
+    puppet singleton-environment add --source <uri> --name <name> [--singleton-environmentpath <path>]
+    puppet singleton-environment delete --name <name> [--singleton-environmentpath <path>]
+    puppet singleton-environment list [--singleton-environmentpath <path>]
