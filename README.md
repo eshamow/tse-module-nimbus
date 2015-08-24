@@ -1,7 +1,5 @@
 # Singleton #
 
-*TODO:* come up with a snazzier name or commit to the name "singleton".
-
 This module provides a new Puppet command, `puppet singleton`.
 
 When `puppet singleton configure` is run, Puppet will set the runtime
