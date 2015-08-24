@@ -78,7 +78,6 @@ Forge will work.
       },
       "macuser/caffeine": {
         "version": "1.0.5",
-        "source":  "http://example.com/macuser-caffeine-1.0.5.tar.gz",
       }
     }
 
