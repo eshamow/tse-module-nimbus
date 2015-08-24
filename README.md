@@ -108,8 +108,55 @@ flag allows you to set the path used explicitly. It may be useful if you have
 manually installed modules or created an environment you want the command to
 use.
 
-## Old Ideas ##
+## Name Ideas ##
 
-    puppet singleton-environment add --source <uri> --name <name> [--singleton-environmentpath <path>]
-    puppet singleton-environment delete --name <name> [--singleton-environmentpath <path>]
-    puppet singleton-environment list [--singleton-environmentpath <path>]
+Naming is still fluid on this module. The following are examples of how the
+command would look with a variety of different name ideas.
+
+### `puppet singleton` ###
+
+    puppet module install tse/singleton
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet singleton --singleton-config=example.conf modules install
+    puppet singleton --singleton-config=example.conf configure
+    puppet singleton configure
+
+### `puppet personal` ###
+
+    puppet module install tse/personal
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet personal --personal-config=example.conf modules install
+    puppet personal --personal-config=example.conf configure
+    puppet personal configure
+
+### `puppet loaner` ###
+
+    puppet module install tse/loaner
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet loaner --loaner-config=example.conf modules install
+    puppet loaner --loaner-config=example.conf configure
+    puppet loaner configure
+
+### `puppet replicant` ###
+
+    puppet module install tse/replicant
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet replicant --replicant-config=example.conf modules install
+    puppet replicant --replicant-config=example.conf configure
+    puppet replicant configure
+
+### `puppet localhost` ###
+
+    puppet module install tse/localhost
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet localhost --localhost-config=example.conf modules install
+    puppet localhost --localhost-config=example.conf configure
+    puppet localhost configure
+
+### `puppet workstation` ###
+
+    puppet module install tse/workstation
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet workstation --workstation-config=example.conf modules install
+    puppet workstation --workstation-config=example.conf configure
+    puppet workstation configure
