@@ -160,3 +160,11 @@ command would look with a variety of different name ideas.
     puppet workstation --workstation-config=example.conf modules install
     puppet workstation --workstation-config=example.conf configure
     puppet workstation configure
+
+### `puppet studio` ###
+
+    puppet module install tse/studio
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet studio --studio-config=example.conf modules install
+    puppet studio --studio-config=example.conf configure
+    puppet studio configure
