@@ -1,6 +1,6 @@
 {
   "name": "tse-singleton",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Puppet Labs TSE Team",
   "summary": "Boxen-inspired personal singleton configuration utility",
   "source": "",
