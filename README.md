@@ -33,7 +33,7 @@ Assume that the Puppet AIO package has just been installed and nothing else.
 This is an example of bootstrapping a singleton configuration. Try it!
 
     puppet module install tse/singleton
-    curl -Lo example.conf http://git.io/vswiI
+    curl -Lo example.conf http://git.io/vs1kv
     puppet singleton --singleton-config=example.conf modules install
     puppet singleton --singleton-config=example.conf configure
 
