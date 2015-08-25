@@ -175,3 +175,35 @@ command would look with a variety of different name ideas.
     puppet studio --studio-config=example.conf modules install
     puppet studio --studio-config=example.conf configure
     puppet studio configure
+
+### `puppet solo` ###
+
+    puppet module install tse/solo
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet solo --solo-config=example.conf modules install
+    puppet solo --solo-config=example.conf configure
+    puppet solo configure
+
+### `puppet sword` ###
+
+    puppet module install tse/sword
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet sword --sword-config=example.conf modules install
+    puppet sword --sword-config=example.conf configure
+    puppet sword configure
+
+### `puppet yolo` ###
+
+    puppet module install tse/yolo
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet yolo --yolo-config=example.conf modules install
+    puppet yolo --yolo-config=example.conf configure
+    puppet yolo configure
+
+### `puppet one` ###
+
+    puppet module install tse/one
+    curl -Lo example.conf http://git.io/vs1kv
+    puppet one --one-config=example.conf modules install
+    puppet one --one-config=example.conf configure
+    puppet one configure
