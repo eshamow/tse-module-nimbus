@@ -1,18 +1,18 @@
-# Singleton #
+# Solo #
 
-This module provides a new Puppet command, `puppet singleton`.
+This module provides a new Puppet command, `puppet solo`.
 
-When `puppet singleton configure` is run, Puppet will set the runtime
-$environmentpath to $singleton_environmentpath, set the runtime $environment
-to $singleton_environment, and read $singleton_config. A custom node
+When `puppet solo configure` is run, Puppet will set the runtime
+$environmentpath to $solo_environmentpath, set the runtime $environment
+to $solo_environment, and read $solo_config. A custom node
 terminus will be switched to that reads classes from the `classes` config key.
 A custom data terminus will be used to bind data from the `data` config key.
-The $singleton_environment will be populated to match the modules defined in
+The $solo_environment will be populated to match the modules defined in
 the `modules` config key. With this configuration primed, Puppet will be run.
 
 The end result is that users may define a single text file that lists all the
 modules they want, the data they want, and the classes they want applied to
-their local machine. They may then use the `puppet singleton` command to
+their local machine. They may then use the `puppet solo` command to
 easily puppetize their system from that input.
 
 Note that alternatively, a confdir may be specified, in which case all .conf
@@ -26,12 +26,12 @@ New users can get started with a config provided by their company or team.
 ## Examples ##
 
 Assume that the Puppet AIO package has just been installed and nothing else.
-This is an example of bootstrapping a singleton configuration. Try it!
+This is an example of bootstrapping a solo configuration. Try it!
 
-    puppet module install tse/singleton
+    puppet module install tse/solo
     curl -Lo example.conf http://git.io/vs1kv
-    puppet singleton --singleton-config=example.conf modules install
-    puppet singleton --singleton-config=example.conf configure
+    puppet solo --solo-config=example.conf modules install
+    puppet solo --solo-config=example.conf configure
 
 Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
 necessary to update root CA bundles used by Puppet to get the module tool
@@ -48,20 +48,20 @@ Forge will work.
 
     $codedir/
     |-- environments/
-    `-- singleton_environments/    # $singleton_environmentpath
-        `-- default                  # $singleton_environment
+    `-- solo_environments/    # $solo_environmentpath
+        `-- default                  # $solo_environment
             |-- manifests/
             |   `-- site.pp
             |-- modules/
             `-- hieradata/
 
     $confdir/
-    `-- singleton/               # $singleton_confdir
-        `-- singleton.conf         # $singleton_config
+    `-- solo/               # $solo_confdir
+        `-- solo.conf         # $solo_config
 
 ## Configuration File ##
 
-    # singleton.conf (hocon)
+    # solo.conf (hocon)
     classes: [
       "git",
       "caffeine",
@@ -83,26 +83,26 @@ Forge will work.
 
 ## Options ##
 
-### `--singleton-config <path>` ###
+### `--solo-config <path>` ###
 
 The path to a Hocon configuration file specifying classes, data, and/or modules
-to use in singleton configuration.
+to use in solo configuration.
 
-### `--singleton-confdir <path>` ###
+### `--solo-confdir <path>` ###
 
 The path to a directory containing one or more `*.conf` Hocon configuration
 files, each of which may specify classes, data, or modules. All the `*.conf`
-files in this directory will be read, merged, and the result used in singleton
+files in this directory will be read, merged, and the result used in solo
 configuration.
 
-### `--singleton-environment <name>` ###
+### `--solo-environment <name>` ###
 
-Puppet singleton uses environments just like Puppet. This flag sets the name of
+Puppet solo uses environments just like Puppet. This flag sets the name of
 the environment the run will use.
 
-### `--singleton-environmentpath <path>` ###
+### `--solo-environmentpath <path>` ###
 
-Puppet singleton typically uses a subcommand-specific environmentpath. This
+Puppet solo typically uses a subcommand-specific environmentpath. This
 flag allows you to set the path used explicitly. It may be useful if you have
 manually installed modules or created an environment you want the command to
 use.
@@ -112,13 +112,13 @@ use.
 Naming is still fluid on this module. The following are examples of how the
 command would look with a variety of different name ideas.
 
-### `puppet singleton` ###
+### `puppet solo` ###
 
-    puppet module install tse/singleton
+    puppet module install tse/solo
     curl -Lo example.conf http://git.io/vs1kv
-    puppet singleton --singleton-config=example.conf modules install
-    puppet singleton --singleton-config=example.conf configure
-    puppet singleton configure
+    puppet solo --solo-config=example.conf modules install
+    puppet solo --solo-config=example.conf configure
+    puppet solo configure
 
 ### `puppet personal` ###
 

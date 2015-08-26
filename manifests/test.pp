@@ -1,4 +1,4 @@
-class singleton::test (
+class solo::test (
   $arg1 = undef,
   $arg2 = undef,
   $arg3 = undef,
@@ -10,5 +10,5 @@ class singleton::test (
     }
   }
 
-  notify { 'singleton::test': }
+  notify { 'solo::test': }
 }
