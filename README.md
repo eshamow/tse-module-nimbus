@@ -1,18 +1,18 @@
-# Solo #
+# Aio (All-In-One) #
 
-This module provides a new Puppet command, `puppet solo`.
+This module provides a new Puppet command, `puppet aio`.
 
-When `puppet solo configure` is run, Puppet will set the runtime
-$environmentpath to $solo_environmentpath, set the runtime $environment
-to $solo_environment, and read $solo_config. A custom node
+When `puppet aio apply` is run, Puppet will set the runtime
+$environmentpath to $aio_environmentpath, set the runtime $environment
+to $aio_environment, and read $aio_config. A custom node
 terminus will be switched to that reads classes from the `classes` config key.
 A custom data terminus will be used to bind data from the `data` config key.
-The $solo_environment will be populated to match the modules defined in
+The $aio_environment will be populated to match the modules defined in
 the `modules` config key. With this configuration primed, Puppet will be run.
 
 The end result is that users may define a single text file that lists all the
 modules they want, the data they want, and the classes they want applied to
-their local machine. They may then use the `puppet solo` command to
+their local machine. They may then use the `puppet aio` command to
 easily puppetize their system from that input.
 
 Note that alternatively, a confdir may be specified, in which case all .conf
@@ -26,12 +26,12 @@ New users can get started with a config provided by their company or team.
 ## Examples ##
 
 Assume that the Puppet AIO package has just been installed and nothing else.
-This is an example of bootstrapping a solo configuration. Try it!
+This is an example of bootstrapping a aio configuration. Try it!
 
-    puppet module install tse/solo
+    puppet module install tse/aio
     curl -Lo example.conf http://git.io/vs1kv
-    puppet solo --solo-config=example.conf modules install
-    puppet solo --solo-config=example.conf configure
+    puppet aio modules install --aio-config=example.conf
+    puppet aio apply --aio-config=example.conf
 
 Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
 necessary to update root CA bundles used by Puppet to get the module tool
@@ -48,20 +48,20 @@ Forge will work.
 
     $codedir/
     |-- environments/
-    `-- solo_environments/    # $solo_environmentpath
-        `-- default                  # $solo_environment
+    `-- aio_environments/    # $aio_environmentpath
+        `-- default                  # $aio_environment
             |-- manifests/
             |   `-- site.pp
             |-- modules/
             `-- hieradata/
 
     $confdir/
-    `-- solo/               # $solo_confdir
-        `-- solo.conf         # $solo_config
+    `-- aio/               # $aio_confdir
+        `-- aio.conf         # $aio_config
 
 ## Configuration File ##
 
-    # solo.conf (hocon)
+    # aio.conf (hocon)
     classes: [
       "git",
       "caffeine",
@@ -83,26 +83,26 @@ Forge will work.
 
 ## Options ##
 
-### `--solo-config <path>` ###
+### `--aio-config <path>` ###
 
 The path to a Hocon configuration file specifying classes, data, and/or modules
-to use in solo configuration.
+to use in aio configuration.
 
-### `--solo-confdir <path>` ###
+### `--aio-confdir <path>` ###
 
 The path to a directory containing one or more `*.conf` Hocon configuration
 files, each of which may specify classes, data, or modules. All the `*.conf`
-files in this directory will be read, merged, and the result used in solo
+files in this directory will be read, merged, and the result used in aio
 configuration.
 
-### `--solo-environment <name>` ###
+### `--aio-environment <name>` ###
 
-Puppet solo uses environments just like Puppet. This flag sets the name of
+Puppet aio uses environments just like Puppet. This flag sets the name of
 the environment the run will use.
 
-### `--solo-environmentpath <path>` ###
+### `--aio-environmentpath <path>` ###
 
-Puppet solo typically uses a subcommand-specific environmentpath. This
+Puppet aio typically uses a subcommand-specific environmentpath. This
 flag allows you to set the path used explicitly. It may be useful if you have
 manually installed modules or created an environment you want the command to
 use.

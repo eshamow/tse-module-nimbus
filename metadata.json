@@ -1,11 +1,11 @@
 {
-  "name": "tse-solo",
+  "name": "tse-aio",
   "version": "0.2.0",
   "author": "Puppet Labs TSE Team",
   "license": "Apache-2.0",
   "summary": "Single-system Puppetized configuration utility",
-  "source": "https://github.com/puppetlabs/tse-module-solo",
-  "project_page": "https://github.com/puppetlabs/tse-module-solo",
+  "source": "https://github.com/puppetlabs/tse-module-aio",
+  "project_page": "https://github.com/puppetlabs/tse-module-aio",
   "dependencies": [
   ]
 }

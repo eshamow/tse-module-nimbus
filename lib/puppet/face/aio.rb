@@ -1,58 +1,59 @@
 require 'puppet/indirector/face'
-require 'puppet_x/solo/config'
+require 'puppet_x/aio/config'
 require 'puppet/application/apply'
 require 'puppet/util/command_line'
 require 'fileutils'
 
-Puppet::Face.define(:solo, '1.0.0') do
+Puppet::Face.define(:aio, '1.0.0') do
 
   copyright "Puppet Labs", 2015
   license   "Puppet Enterprise Software License Agreement"
 
-  summary "Manage configuration of the local system."
+  summary "Manage configuration of the local system using an all-in-one (aio) input."
   description <<-'EOT'
     This subcommand uses Puppet to configure state on the local system using a
-    standalone Puppet environment.
+    standalone all-in-one (aio) Puppet environment, with all classification,
+    data bindings, and modules (code) specified in a unified input.
   EOT
 
-  option('--solo-environment <environment>') do |arg|
+  option('--aio-environment <environment>') do |arg|
     default_to { 'default' }
-    summary "the solo_environment value to use"
+    summary "the aio_environment value to use"
   end
 
-  option('--solo-environmentpath <path>') do |arg|
-    default_to { File.join(Puppet[:codedir], 'solo_environments') }
-    summary "the solo_environmentpath value to use"
+  option('--aio-environmentpath <path>') do |arg|
+    default_to { File.join(Puppet[:codedir], 'aio_environments') }
+    summary "the aio_environmentpath value to use"
   end
 
-  option('--solo-confdir <path>') do |arg|
-    default_to { File.join(Puppet[:confdir], 'solo') }
-    summary "the solo_confdir value to use"
+  option('--aio-confdir <path>') do |arg|
+    default_to { File.join(Puppet[:confdir], 'aio') }
+    summary "the aio_confdir value to use"
   end
 
-  option('--solo-config <path>') do |arg|
+  option('--aio-config <path>') do |arg|
     default_to { nil }
     summary "a specific configuration file to use"
   end
 
   action :help do
     default
-    summary "Display help about the solo subcommand."
+    summary "Display help about the aio subcommand."
     when_invoked do |*args|
-      Puppet::Face[:help, '0.0.1'].help('solo')
+      Puppet::Face[:help, '0.0.1'].help('aio')
     end
   end
 
   action :modules do
-    summary "Manage solo modules."
+    summary "Manage aio modules."
     when_invoked do |command, options|
-      solo_context(options) do
+      aio_context(options) do
         case command
         when "install"
-          modules = PuppetX::Solo::Config[:modules]
+          modules = PuppetX::Aio::Config[:modules]
           modules.each do |key,value|
             install = Puppet::Face[:module, '1.0.0'].install(key,
-              :environment => options[:solo_environment],
+              :environment => options[:aio_environment],
               :ignore_dependencies => true,
               :force => true,
               :version => value['version']
@@ -64,7 +65,7 @@ Puppet::Face.define(:solo, '1.0.0') do
             end
           end
         when "list"
-          Puppet::Face[:module, '1.0.0'].list(:environment => options[:solo_environment])
+          Puppet::Face[:module, '1.0.0'].list(:environment => options[:aio_environment])
         else
           raise 'specify either "list" or "install".'
         end
@@ -85,10 +86,10 @@ Puppet::Face.define(:solo, '1.0.0') do
     end
   end
 
-  action :configure do
-    summary "Configure the local system using Puppet."
+  action :apply do
+    summary "Configure the local system using Puppet all-in-one."
     when_invoked do |options|
-      solo_context(options) do
+      aio_context(options) do
         argv = ['--execute', '']
         command_line = Puppet::Util::CommandLine.new('puppet', argv)
         apply = Puppet::Application::Apply.new(command_line)
@@ -99,7 +100,7 @@ Puppet::Face.define(:solo, '1.0.0') do
   end
 
   action :get do
-    summary "Retrieve and install a solo configuration file."
+    summary "Retrieve and install a aio configuration file."
     arguments "<uri>"
     when_invoked do |uri, options|
       set_global_config(options)
@@ -107,12 +108,12 @@ Puppet::Face.define(:solo, '1.0.0') do
     end
   end
 
-  def solo_context(options, &block)
+  def aio_context(options, &block)
     set_global_config(options)
-    Puppet[:node_terminus] = 'solo'
-    Puppet[:data_binding_terminus] = 'solo'
-    Puppet[:environmentpath] = options[:solo_environmentpath]
-    Puppet[:environment] = options[:solo_environment]
+    Puppet[:node_terminus] = 'aio'
+    Puppet[:data_binding_terminus] = 'aio'
+    Puppet[:environmentpath] = options[:aio_environmentpath]
+    Puppet[:environment] = options[:aio_environment]
 
     loader = Puppet::Environments::Directories.new(
       Puppet[:environmentpath],
@@ -125,23 +126,23 @@ Puppet::Face.define(:solo, '1.0.0') do
   end
 
   def set_global_config(options)
-    PuppetX::Solo::Config.environment = options[:solo_environment]
-    PuppetX::Solo::Config.environmentpath = options[:solo_environmentpath]
-    PuppetX::Solo::Config.confdir = options[:solo_confdir]
-    PuppetX::Solo::Config.config = options[:solo_config]
+    PuppetX::Aio::Config.environment = options[:aio_environment]
+    PuppetX::Aio::Config.environmentpath = options[:aio_environmentpath]
+    PuppetX::Aio::Config.confdir = options[:aio_confdir]
+    PuppetX::Aio::Config.config = options[:aio_config]
 
     # Make a best-effort to create the working directories if they don't
     # already exist. Note the use of mkdir instead of mkdir_p; this will only
     # work if the parent directories already exist.
-    [ options[:solo_environmentpath],
-      options[:solo_confdir],
-      File.join(options[:solo_environmentpath], options[:solo_environment]),
+    [ options[:aio_environmentpath],
+      options[:aio_confdir],
+      File.join(options[:aio_environmentpath], options[:aio_environment]),
     ].each do |dir|
       FileUtils.mkdir(dir) unless File.exist?(dir)
     end
 
     # Load config, if there is any
-    PuppetX::Solo::Config.parse_config!
+    PuppetX::Aio::Config.parse_config!
   end
 
 end

@@ -2,9 +2,9 @@ require 'singleton'
 require 'hocon'
 
 module PuppetX
-  module Solo
+  module Aio
     class Config
-      include Solo
+      include Aio
 
       singleton_class.class_eval { attr_accessor :environment }
       singleton_class.class_eval { attr_accessor :environmentpath }

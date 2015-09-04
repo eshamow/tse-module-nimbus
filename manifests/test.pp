@@ -1,4 +1,4 @@
-class solo::test (
+class aio::test (
   $arg1 = undef,
   $arg2 = undef,
   $arg3 = undef,
@@ -10,5 +10,5 @@ class solo::test (
     }
   }
 
-  notify { 'solo::test': }
+  notify { 'aio::test': }
 }
