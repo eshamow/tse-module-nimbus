@@ -44,51 +44,47 @@ Puppet::Face.define(:aio, '1.0.0') do
     end
   end
 
-  action :modules do
-    summary "Manage aio modules."
-    when_invoked do |command, options|
+  action :install_modules do
+    summary "Install modules specified by an aio configuration file in an aio environment."
+    when_invoked do |*configs, options|
+      options[:argv_configs] = configs
       aio_context(options) do
-        case command
-        when "install"
-          modules = PuppetX::Aio::Config[:modules]
-          modules.each do |key,value|
-            install = Puppet::Face[:module, '1.0.0'].install(key,
-              :environment => options[:aio_environment],
-              :ignore_dependencies => true,
-              :force => true,
-              :version => value['version']
-            )
-            if install[:result] == :failure
-              raise install[:error][:multiline]
-            else
-              puts "Notice: Installed #{key} (#{value['version']})"
-            end
+        modules = PuppetX::Aio::Config[:modules]
+        modules.each do |key,value|
+          install = Puppet::Face[:module, '1.0.0'].install(key,
+            :environment => options[:aio_environment],
+            :ignore_dependencies => true,
+            :force => true,
+            :version => value['version']
+          )
+          if install[:result] == :failure
+            raise install[:error][:multiline]
+          else
+            puts "Notice: Installed #{key} (#{value['version']})"
           end
-        when "list"
-          Puppet::Face[:module, '1.0.0'].list(:environment => options[:aio_environment])
-        else
-          raise 'specify either "list" or "install".'
         end
       end
     end
+  end
 
-    when_rendering :console do |result, command, options|
-      case command
-      when "list"
-        # TODO: do a custom render. For now I'm just hijacking the render
-        # method from the module face. This is, of course, terrible.
-        Puppet::Face[:module, '1.0.0'].get_action(:list).instance_variable_get(:@when_rendering)[:console].bind(Puppet::Face[:module, '1.0.0']).call(result, {})
-      when "install"
-        ""
-      else
-        result
+  action :list_modules do
+    when_invoked do |options|
+      aio_context(options) do
+        Puppet::Face[:module, '1.0.0'].list(:environment => options[:aio_environment])
       end
+    end
+
+    when_rendering :console do |result|
+      # TODO: do a custom render. For now I'm just hijacking the render
+      # method from the module face. This is, of course, terrible.
+      Puppet::Face[:module, '1.0.0'].get_action(:list).instance_variable_get(:@when_rendering)[:console].bind(Puppet::Face[:module, '1.0.0']).call(result, {})
     end
   end
 
   action :apply do
     summary "Configure the local system using Puppet all-in-one."
-    when_invoked do |options|
+    when_invoked do |*configs, options|
+      options[:argv_configs] = configs
       aio_context(options) do
         argv = ['--execute', '']
         command_line = Puppet::Util::CommandLine.new('puppet', argv)
@@ -129,7 +125,9 @@ Puppet::Face.define(:aio, '1.0.0') do
     PuppetX::Aio::Config.environment = options[:aio_environment]
     PuppetX::Aio::Config.environmentpath = options[:aio_environmentpath]
     PuppetX::Aio::Config.confdir = options[:aio_confdir]
-    PuppetX::Aio::Config.config = options[:aio_config]
+
+    options[:argv_configs] = nil unless options[:argv_configs] != [{}]
+    PuppetX::Aio::Config.config = [options[:aio_config], options[:argv_configs]].flatten.compact
 
     # Make a best-effort to create the working directories if they don't
     # already exist. Note the use of mkdir instead of mkdir_p; this will only

@@ -30,8 +30,8 @@ This is an example of bootstrapping a aio configuration. Try it!
 
     puppet module install tse/aio
     curl -Lo example.conf http://git.io/vs1kv
-    puppet aio modules install --aio-config=example.conf
-    puppet aio apply --aio-config=example.conf
+    puppet aio install_modules example.conf
+    puppet aio apply example.conf
 
 Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
 necessary to update root CA bundles used by Puppet to get the module tool
