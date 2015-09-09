@@ -81,7 +81,7 @@ This is an example of bootstrapping a aio configuration. Try it!
       },
       "lwf/remote_file": {
         "type": "tarball",
-        "source": "https://forgeapi.puppetlabs.com/v3/files/lwf-remote_file-1.0.1.tar.gz",
+        "source": "https://github.com/lwf/puppet-remote_file/archive/v1.0.1.tar.gz",
         "version": "1.0.1",
       }
     }
