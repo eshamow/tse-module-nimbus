@@ -3,6 +3,8 @@ require 'puppet_x/aio/config'
 require 'puppet/application/apply'
 require 'puppet/util/command_line'
 require 'fileutils'
+require 'open-uri'
+require 'tempfile'
 
 Puppet::Face.define(:aio, '1.0.0') do
 
@@ -50,20 +52,18 @@ Puppet::Face.define(:aio, '1.0.0') do
       options[:argv_configs] = configs
       aio_context(options) do
         modules = PuppetX::Aio::Config[:modules]
-        modules.each do |key,value|
-          install = Puppet::Face[:module, '1.0.0'].install(key,
-            :environment => options[:aio_environment],
-            :ignore_dependencies => true,
-            :force => true,
-            :version => value['version']
-          )
-          if install[:result] == :failure
-            raise install[:error][:multiline]
+        modules.each do |name,params|
+          case params['type']
+          when 'forge', nil
+            install_module_using_pmt(name, params, options)
+          when 'tarball'
+            install_module_from_uri(name, params, options)
           else
-            puts "Notice: Installed #{key} (#{value['version']})"
+            puts "Error: unable to install #{name} from type #{params['type']}"
           end
         end
       end
+      "Done"
     end
   end
 
@@ -101,6 +101,35 @@ Puppet::Face.define(:aio, '1.0.0') do
     when_invoked do |uri, options|
       set_global_config(options)
       raise ":get action not implemented"
+    end
+  end
+
+  def install_module_from_uri(name, params, options)
+    file = Tempfile.new('aio_puppet_module')
+    begin
+      file.binmode
+      open(params['source']) do |uri|
+        file.write(uri.read)
+      end
+      params['source'] = file.path
+      install_module_using_pmt(name, params, options)
+    ensure
+      file.close
+      file.unlink
+    end
+  end
+
+  def install_module_using_pmt(name, params, options)
+    install = Puppet::Face[:module, '1.0.0'].install(name,
+      :environment => options[:aio_environment],
+      :ignore_dependencies => true,
+      :force => true,
+      :version => params['version']
+    )
+    if install[:result] == :failure
+      raise install[:error][:multiline]
+    else
+      puts "Notice: Installed #{name} (#{params['version']})"
     end
   end
 

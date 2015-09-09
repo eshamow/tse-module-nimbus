@@ -63,21 +63,26 @@ This is an example of bootstrapping a aio configuration. Try it!
 
     # aio.conf (hocon)
     classes: [
-      "git",
-      "caffeine",
+      "stdlib::stages",
+      "aio::test",
     ]
 
     data: {
-      "git::version": "2.5.0",
-      "caffeine::default_duration": "1h",
+      "aio::test::arg1": "example",
+      "aio::test::arg2": "like hiera data",
     }
 
     modules: {
-      "puppetlabs/git": {
-        "version": "1.0.0",
+      "puppetlabs/stdlib": {
+        "version": "4.9.0",
       },
-      "macuser/caffeine": {
-        "version": "1.0.5",
+      "tse/aio": {
+        "version": "0.4.0",
+      },
+      "lwf/remote_file": {
+        "type": "tarball",
+        "source": "https://forgeapi.puppetlabs.com/v3/files/lwf-remote_file-1.0.1.tar.gz",
+        "version": "1.0.1",
       }
     }
 
