@@ -77,7 +77,7 @@ This is an example of bootstrapping a aio configuration. Try it!
         "version": "4.9.0",
       },
       "tse/aio": {
-        "version": "0.4.0",
+        "version": "0.4.1",
       },
       "lwf/remote_file": {
         "type": "tarball",

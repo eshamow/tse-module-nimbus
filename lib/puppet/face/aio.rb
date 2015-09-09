@@ -105,14 +105,13 @@ Puppet::Face.define(:aio, '1.0.0') do
   end
 
   def install_module_from_uri(name, params, options)
-    file = Tempfile.new('aio_puppet_module')
+    file = Tempfile.new("#{name.gsub(/(\\|\/)/, '_')}_")
     begin
       file.binmode
       open(params['source']) do |uri|
         file.write(uri.read)
       end
-      params['source'] = file.path
-      install_module_using_pmt(name, params, options)
+      install_module_using_pmt(file.path, params, options)
     ensure
       file.close
       file.unlink
