@@ -29,20 +29,20 @@ Assume that the Puppet AIO package has just been installed and nothing else.
 This is an example of bootstrapping a aio configuration. Try it!
 
     puppet module install tse/aio
-    curl -Lo example.conf http://git.io/vs1kv
+    curl -Lo example.conf http://git.io/vZn9O
     puppet aio install_modules example.conf
     puppet aio apply example.conf
 
-Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
-necessary to update root CA bundles used by Puppet to get the module tool
-working (to install modules). The following can be used to do that:
-
-    export OPENSSL=/opt/puppetlabs/puppet/bin/openssl
-    sudo /opt/puppetlabs/puppet/bin/c_rehash /opt/puppetlabs/puppet/lib/ruby/2.1.0/rubygems/ssl_certs
-    export SSL_CERT_DIR=/opt/puppetlabs/puppet/lib/ruby/2.1.0/rubygems/ssl_certs
-
-As long as SSL_CERT_DIR is set correctly any Puppet command that needs access to the
-Forge will work.
+> Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
+> necessary to update root CA bundles used by Puppet to get the module tool
+> working (to install modules). The following can be used to do that:
+>
+>     export OPENSSL=/opt/puppetlabs/puppet/bin/openssl
+>     sudo /opt/puppetlabs/puppet/bin/c_rehash /opt/puppetlabs/puppet/lib/ruby/2.1.0/rubygems/ssl_certs
+>     export SSL_CERT_DIR=/opt/puppetlabs/puppet/lib/ruby/2.1.0/rubygems/ssl_certs
+>
+> As long as SSL_CERT_DIR is set correctly any Puppet command that needs access to the
+> Forge will work.
 
 ## Directory structure ##
 
