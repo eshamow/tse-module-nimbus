@@ -1,57 +1,57 @@
 require 'puppet/indirector/face'
-require 'puppet_x/aio/config'
+require 'puppet_x/nimbus/config'
 require 'puppet/application/apply'
 require 'puppet/util/command_line'
 require 'fileutils'
 require 'open-uri'
 require 'tempfile'
 
-Puppet::Face.define(:aio, '1.0.0') do
+Puppet::Face.define(:nimbus, '1.0.0') do
 
   copyright "Puppet Labs", 2015
   license   "Puppet Enterprise Software License Agreement"
 
-  summary "Manage configuration of the local system using an all-in-one (aio) input."
+  summary "Manage configuration of the local system using an all-in-one (nimbus) input."
   description <<-'EOT'
     This subcommand uses Puppet to configure state on the local system using a
-    standalone all-in-one (aio) Puppet environment, with all classification,
+    standalone all-in-one (nimbus) Puppet environment, with all classification,
     data bindings, and modules (code) specified in a unified input.
   EOT
 
-  option('--aio-environment <environment>') do |arg|
+  option('--nimbus-environment <environment>') do |arg|
     default_to { 'default' }
-    summary "the aio_environment value to use"
+    summary "the nimbus_environment value to use"
   end
 
-  option('--aio-environmentpath <path>') do |arg|
-    default_to { File.join(Puppet[:codedir], 'aio_environments') }
-    summary "the aio_environmentpath value to use"
+  option('--nimbus-environmentpath <path>') do |arg|
+    default_to { File.join(Puppet[:codedir], 'nimbus_environments') }
+    summary "the nimbus_environmentpath value to use"
   end
 
-  option('--aio-confdir <path>') do |arg|
-    default_to { File.join(Puppet[:confdir], 'aio') }
-    summary "the aio_confdir value to use"
+  option('--nimbus-confdir <path>') do |arg|
+    default_to { File.join(Puppet[:confdir], 'nimbus') }
+    summary "the nimbus_confdir value to use"
   end
 
-  option('--aio-config <path>') do |arg|
+  option('--nimbus-config <path>') do |arg|
     default_to { nil }
     summary "a specific configuration file to use"
   end
 
   action :help do
     default
-    summary "Display help about the aio subcommand."
+    summary "Display help about the nimbus subcommand."
     when_invoked do |*args|
-      Puppet::Face[:help, '0.0.1'].help('aio')
+      Puppet::Face[:help, '0.0.1'].help('nimbus')
     end
   end
 
   action :install_modules do
-    summary "Install modules specified by an aio configuration file in an aio environment."
+    summary "Install modules specified by an nimbus configuration file in an nimbus environment."
     when_invoked do |*configs, options|
       options[:argv_configs] = configs
-      aio_context(options) do
-        modules = PuppetX::Aio::Config[:modules]
+      nimbus_context(options) do
+        modules = PuppetX::Nimbus::Config[:modules]
         modules.each do |name,params|
           case params['type']
           when 'forge', nil
@@ -69,8 +69,8 @@ Puppet::Face.define(:aio, '1.0.0') do
 
   action :list_modules do
     when_invoked do |options|
-      aio_context(options) do
-        Puppet::Face[:module, '1.0.0'].list(:environment => options[:aio_environment])
+      nimbus_context(options) do
+        Puppet::Face[:module, '1.0.0'].list(:environment => options[:nimbus_environment])
       end
     end
 
@@ -85,7 +85,7 @@ Puppet::Face.define(:aio, '1.0.0') do
     summary "Configure the local system using Puppet all-in-one."
     when_invoked do |*configs, options|
       options[:argv_configs] = configs
-      aio_context(options) do
+      nimbus_context(options) do
         argv = ['--execute', '']
         command_line = Puppet::Util::CommandLine.new('puppet', argv)
         apply = Puppet::Application::Apply.new(command_line)
@@ -96,7 +96,7 @@ Puppet::Face.define(:aio, '1.0.0') do
   end
 
   action :get do
-    summary "Retrieve and install a aio configuration file."
+    summary "Retrieve and install a nimbus configuration file."
     arguments "<uri>"
     when_invoked do |uri, options|
       set_global_config(options)
@@ -120,7 +120,7 @@ Puppet::Face.define(:aio, '1.0.0') do
 
   def install_module_using_pmt(name, params, options)
     install = Puppet::Face[:module, '1.0.0'].install(name,
-      :environment => options[:aio_environment],
+      :environment => options[:nimbus_environment],
       :ignore_dependencies => true,
       :force => true,
       :version => params['version']
@@ -132,12 +132,12 @@ Puppet::Face.define(:aio, '1.0.0') do
     end
   end
 
-  def aio_context(options, &block)
+  def nimbus_context(options, &block)
     set_global_config(options)
-    Puppet[:node_terminus] = 'aio'
-    Puppet[:data_binding_terminus] = 'aio'
-    Puppet[:environmentpath] = options[:aio_environmentpath]
-    Puppet[:environment] = options[:aio_environment]
+    Puppet[:node_terminus] = 'nimbus'
+    Puppet[:data_binding_terminus] = 'nimbus'
+    Puppet[:environmentpath] = options[:nimbus_environmentpath]
+    Puppet[:environment] = options[:nimbus_environment]
 
     loader = Puppet::Environments::Directories.new(
       Puppet[:environmentpath],
@@ -150,25 +150,25 @@ Puppet::Face.define(:aio, '1.0.0') do
   end
 
   def set_global_config(options)
-    PuppetX::Aio::Config.environment = options[:aio_environment]
-    PuppetX::Aio::Config.environmentpath = options[:aio_environmentpath]
-    PuppetX::Aio::Config.confdir = options[:aio_confdir]
+    PuppetX::Nimbus::Config.environment = options[:nimbus_environment]
+    PuppetX::Nimbus::Config.environmentpath = options[:nimbus_environmentpath]
+    PuppetX::Nimbus::Config.confdir = options[:nimbus_confdir]
 
     options[:argv_configs] = nil unless options[:argv_configs] != [{}]
-    PuppetX::Aio::Config.config = [options[:aio_config], options[:argv_configs]].flatten.compact
+    PuppetX::Nimbus::Config.config = [options[:nimbus_config], options[:argv_configs]].flatten.compact
 
     # Make a best-effort to create the working directories if they don't
     # already exist. Note the use of mkdir instead of mkdir_p; this will only
     # work if the parent directories already exist.
-    [ options[:aio_environmentpath],
-      options[:aio_confdir],
-      File.join(options[:aio_environmentpath], options[:aio_environment]),
+    [ options[:nimbus_environmentpath],
+      options[:nimbus_confdir],
+      File.join(options[:nimbus_environmentpath], options[:nimbus_environment]),
     ].each do |dir|
       FileUtils.mkdir(dir) unless File.exist?(dir)
     end
 
     # Load config, if there is any
-    PuppetX::Aio::Config.parse_config!
+    PuppetX::Nimbus::Config.parse_config!
   end
 
 end

@@ -1,19 +1,19 @@
-# Aio (All-In-One) #
+# Nimbus #
 
-This module provides a new Puppet command, `puppet aio`.
+This module provides a new Puppet command, `puppet nimbus`.
 
-When `puppet aio apply` is run, Puppet will set the runtime
-$environmentpath to $aio_environmentpath, set the runtime $environment
-to $aio_environment, and read $aio_config. A custom node
+When `puppet nimbus apply` is run, Puppet will set the runtime
+$environmentpath to `$nimbus_environmentpath`, set the runtime `$environment`
+to `$nimbus_environment`, and read `$nimbus_config`. A custom node
 terminus will be switched to that reads classes from the `classes` config key.
 A custom data terminus will be used to bind data from the `data` config key.
-The $aio_environment will be populated to match the modules defined in
+The `$nimbus_environment` will be populated to match the modules defined in
 the `modules` config key. With this configuration primed, Puppet will be run.
 
-The end result is that users may define a single text file that lists all the
-modules they want, the data they want, and the classes they want applied to
-their local machine. They may then use the `puppet aio` command to
-easily puppetize their system from that input.
+The end result is that users may define a single text file or set of text files
+to be merged that list all the modules they want, the data they want, and the
+classes they want applied to their local machine. They may then use the `puppet
+nimbus` command to easily puppetize their system from that input.
 
 Note that alternatively, a confdir may be specified, in which case all .conf
 files inside the confdir will be read and merged into a compositional
@@ -23,15 +23,24 @@ file.
 
 New users can get started with a config provided by their company or team.
 
+## Volatility Note ##
+
+This module is in early development and everything is subject to change. That
+includes the module name. This subcommand this module provides has previously
+been called by many other names including `puppet singleton`, `puppet
+workstation`, `puppet solo`, and `puppet aio`. Currently it is called `puppet
+nimbus`, which is intended to be a codename which does not convey any
+particular function other than serving as an identifier.
+
 ## Examples ##
 
 Assume that the Puppet AIO package has just been installed and nothing else.
-This is an example of bootstrapping a aio configuration. Try it!
+This is an example of bootstrapping a nimbus configuration. Try it!
 
-    puppet module install tse/aio
-    curl -Lo example.conf http://git.io/vZn9O
-    puppet aio install_modules example.conf
-    puppet aio apply example.conf
+    puppet module install tse/nimbus
+    curl -Lo example.conf http://git.io/vZBXu
+    puppet nimbus install_modules example.conf
+    puppet nimbus apply example.conf
 
 > Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
 > necessary to update root CA bundles used by Puppet to get the module tool
@@ -48,36 +57,36 @@ This is an example of bootstrapping a aio configuration. Try it!
 
     $codedir/
     |-- environments/
-    `-- aio_environments/    # $aio_environmentpath
-        `-- default                  # $aio_environment
+    `-- nimbus_environments/    # $nimbus_environmentpath
+        `-- default                  # $nimbus_environment
             |-- manifests/
             |   `-- site.pp
             |-- modules/
             `-- hieradata/
 
     $confdir/
-    `-- aio/               # $aio_confdir
-        `-- aio.conf         # $aio_config
+    `-- nimbus/               # $nimbus_confdir
+        `-- nimbus.conf         # $nimbus_config
 
 ## Configuration File ##
 
-    # aio.conf (hocon)
+    # nimbus.conf (hocon)
     classes: [
       "stdlib::stages",
-      "aio::test",
+      "nimbus::test",
     ]
 
     data: {
-      "aio::test::arg1": "example",
-      "aio::test::arg2": "like hiera data",
+      "nimbus::test::arg1": "example",
+      "nimbus::test::arg2": "like hiera data",
     }
 
     modules: {
       "puppetlabs/stdlib": {
         "version": "4.9.0",
       },
-      "tse/aio": {
-        "version": "0.4.1",
+      "tse/nimbus": {
+        "version": "0.5.0",
       },
       "lwf/remote_file": {
         "type": "tarball",
@@ -88,26 +97,26 @@ This is an example of bootstrapping a aio configuration. Try it!
 
 ## Options ##
 
-### `--aio-config <path>` ###
+### `--nimbus-config <path>` ###
 
 The path to a Hocon configuration file specifying classes, data, and/or modules
-to use in aio configuration.
+to use in nimbus configuration.
 
-### `--aio-confdir <path>` ###
+### `--nimbus-confdir <path>` ###
 
 The path to a directory containing one or more `*.conf` Hocon configuration
 files, each of which may specify classes, data, or modules. All the `*.conf`
-files in this directory will be read, merged, and the result used in aio
+files in this directory will be read, merged, and the result used in nimbus
 configuration.
 
-### `--aio-environment <name>` ###
+### `--nimbus-environment <name>` ###
 
-Puppet aio uses environments just like Puppet. This flag sets the name of
+Puppet nimbus uses environments just like Puppet. This flag sets the name of
 the environment the run will use.
 
-### `--aio-environmentpath <path>` ###
+### `--nimbus-environmentpath <path>` ###
 
-Puppet aio typically uses a subcommand-specific environmentpath. This
+Puppet nimbus typically uses a subcommand-specific environmentpath. This
 flag allows you to set the path used explicitly. It may be useful if you have
 manually installed modules or created an environment you want the command to
 use.

@@ -2,9 +2,9 @@ require 'singleton'
 require 'hocon'
 
 module PuppetX
-  module Aio
+  module Nimbus
     class Config
-      include Aio
+      include Nimbus
 
       singleton_class.class_eval { attr_accessor :environment }
       singleton_class.class_eval { attr_accessor :environmentpath }

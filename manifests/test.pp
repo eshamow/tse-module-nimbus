@@ -1,4 +1,4 @@
-class aio::test (
+class nimbus::test (
   $arg1 = undef,
   $arg2 = undef,
   $arg3 = undef,
@@ -10,5 +10,5 @@ class aio::test (
     }
   }
 
-  notify { 'aio::test': }
+  notify { 'nimbus::test': }
 }
