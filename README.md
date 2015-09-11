@@ -34,6 +34,8 @@ particular function other than serving as an identifier.
 
 ## Examples ##
 
+### Basic ###
+
 Assume that the Puppet AIO package has just been installed and nothing else.
 This is an example of bootstrapping a nimbus configuration. Try it!
 
@@ -52,6 +54,24 @@ This is an example of bootstrapping a nimbus configuration. Try it!
 >
 > As long as SSL_CERT_DIR is set correctly any Puppet command that needs access to the
 > Forge will work.
+
+### With Existing Modules ###
+
+In the event an r10k control repo is used to define the environment, nimbus may be used for classification and data while referencing the environment r10k sets up.
+
+    r10k puppetfile install /path/to/prod/Puppetfile
+    puppet module install tse/nimbus
+    curl -Lo example.conf http://git.io/vZBXu
+
+r10k of course isn't strictly necessary. Any means of populating the modules will work.
+
+After the modules have been configured, use one of:
+
+    puppet nimbus apply example.conf --modulepath=/path/to/prod/modules
+
+or
+
+    puppet nimbus apply example.conf --nimbus-environmentpath=/path/to --nimbus-environment=prod
 
 ## Directory structure ##
 

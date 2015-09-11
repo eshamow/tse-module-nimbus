@@ -4,7 +4,7 @@ require 'hocon'
 module PuppetX
   module Nimbus
     class Config
-      include Nimbus
+      include Singleton
 
       singleton_class.class_eval { attr_accessor :environment }
       singleton_class.class_eval { attr_accessor :environmentpath }
