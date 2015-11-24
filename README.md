@@ -40,9 +40,15 @@ Assume that the Puppet AIO package has just been installed and nothing else.
 This is an example of bootstrapping a nimbus configuration. Try it!
 
     puppet module install tse/nimbus
-    curl -Lo example.conf http://git.io/vZBXu
+    curl -Lo example.conf https://git.io/vZBXu
     puppet nimbus install_modules example.conf
     puppet nimbus apply example.conf
+
+Or:
+
+    puppet module install tse/nimbus
+    puppet nimbus install_modules https://git.io/vZBXu
+    puppet nimbus apply https://git.io/vZBXu
 
 > Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
 > necessary to update root CA bundles used by Puppet to get the module tool
@@ -52,8 +58,8 @@ This is an example of bootstrapping a nimbus configuration. Try it!
 >     sudo /opt/puppetlabs/puppet/bin/c_rehash /opt/puppetlabs/puppet/lib/ruby/2.1.0/rubygems/ssl_certs
 >     export SSL_CERT_DIR=/opt/puppetlabs/puppet/lib/ruby/2.1.0/rubygems/ssl_certs
 >
-> As long as SSL_CERT_DIR is set correctly any Puppet command that needs access to the
-> Forge will work.
+> As long as SSL\_CERT\_DIR is set correctly any Puppet command that needs
+> access to the > Forge will work.
 
 ### With Existing Modules ###
 

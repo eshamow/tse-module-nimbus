@@ -1,5 +1,6 @@
 require 'singleton'
 require 'hocon'
+require 'open-uri'
 
 module PuppetX
   module Nimbus
@@ -20,8 +21,9 @@ module PuppetX
 
       def self.parse_config!
         @data = {:classes => [], :data => {}, :modules => {}}
-        @config.each do |file|
-          new_data = Hocon::ConfigFactory.parse_file(file).root.unwrapped
+        @config.each do |location|
+          hocon_string = open(location) { |loc| loc.read }
+          new_data = Hocon::ConfigFactory.parse_string(hocon_string).root.unwrapped
           @data[:classes] << new_data['classes']      if new_data['classes']
           @data[:data].merge!(new_data['data'])       if new_data['data']
           @data[:modules].merge!(new_data['modules']) if new_data['modules']
