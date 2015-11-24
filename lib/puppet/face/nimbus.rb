@@ -18,26 +18,6 @@ Puppet::Face.define(:nimbus, '1.0.0') do
     data bindings, and modules (code) specified in a unified input.
   EOT
 
-  option('--nimbus-environment <environment>') do |arg|
-    default_to { 'default' }
-    summary "the nimbus_environment value to use"
-  end
-
-  option('--nimbus-environmentpath <path>') do |arg|
-    default_to { File.join(Puppet[:codedir], 'nimbus_environments') }
-    summary "the nimbus_environmentpath value to use"
-  end
-
-  option('--nimbus-confdir <path>') do |arg|
-    default_to { File.join(Puppet[:confdir], 'nimbus') }
-    summary "the nimbus_confdir value to use"
-  end
-
-  option('--nimbus-config <path>') do |arg|
-    default_to { nil }
-    summary "a specific configuration file to use"
-  end
-
   action :help do
     default
     summary "Display help about the nimbus subcommand."
@@ -47,10 +27,9 @@ Puppet::Face.define(:nimbus, '1.0.0') do
   end
 
   action :install_modules do
-    summary "Install modules specified by an nimbus configuration file in an nimbus environment."
-    when_invoked do |*configs, options|
-      options[:argv_configs] = configs
-      nimbus_context(options) do
+    summary "Install modules specified in given nimbus configuration file(s) in a nimbus environment."
+    when_invoked do |*user_arguments, options|
+      nimbus_context(user_arguments) do
         modules = PuppetX::Nimbus::Config[:modules]
         modules.each do |name,params|
           case params['type']
@@ -69,8 +48,8 @@ Puppet::Face.define(:nimbus, '1.0.0') do
 
   action :list_modules do
     when_invoked do |options|
-      nimbus_context(options) do
-        Puppet::Face[:module, '1.0.0'].list(:environment => options[:nimbus_environment])
+      nimbus_context do
+        Puppet::Face[:module, '1.0.0'].list(:environment => setting_environment)
       end
     end
 
@@ -82,10 +61,9 @@ Puppet::Face.define(:nimbus, '1.0.0') do
   end
 
   action :apply do
-    summary "Configure the local system using Puppet all-in-one."
-    when_invoked do |*configs, options|
-      options[:argv_configs] = configs
-      nimbus_context(options) do
+    summary "Configure the local system using given Puppet all-in-one configuration file(s)."
+    when_invoked do |*user_arguments, options|
+      nimbus_context(user_arguments) do
         argv = ['--execute', '']
         command_line = Puppet::Util::CommandLine.new('puppet', argv)
         apply = Puppet::Application::Apply.new(command_line)
@@ -99,9 +77,16 @@ Puppet::Face.define(:nimbus, '1.0.0') do
     summary "Retrieve and install a nimbus configuration file."
     arguments "<uri>"
     when_invoked do |uri, options|
-      set_global_config(options)
       raise ":get action not implemented"
     end
+  end
+
+  def setting_environment
+    'default'
+  end
+
+  def setting_environmentpath
+    File.join(Puppet[:codedir], 'nimbus_environments')
   end
 
   def install_module_from_uri(name, params, options)
@@ -120,7 +105,7 @@ Puppet::Face.define(:nimbus, '1.0.0') do
 
   def install_module_using_pmt(name, params, options)
     install = Puppet::Face[:module, '1.0.0'].install(name,
-      :environment => options[:nimbus_environment],
+      :environment => setting_environment,
       :ignore_dependencies => true,
       :force => true,
       :version => params['version']
@@ -132,12 +117,13 @@ Puppet::Face.define(:nimbus, '1.0.0') do
     end
   end
 
-  def nimbus_context(options, &block)
-    set_global_config(options)
-    Puppet[:node_terminus] = 'nimbus'
+  def nimbus_context(user_arguments = [], &block)
+
+    set_global_config(user_arguments)
+    Puppet[:node_terminus]         = 'nimbus'
     Puppet[:data_binding_terminus] = 'nimbus'
-    Puppet[:environmentpath] = options[:nimbus_environmentpath]
-    Puppet[:environment] = options[:nimbus_environment]
+    Puppet[:environmentpath]       = setting_environmentpath
+    Puppet[:environment]           = setting_environment
 
     loader = Puppet::Environments::Directories.new(
       Puppet[:environmentpath],
@@ -149,20 +135,20 @@ Puppet::Face.define(:nimbus, '1.0.0') do
     end
   end
 
-  def set_global_config(options)
-    PuppetX::Nimbus::Config.environment = options[:nimbus_environment]
-    PuppetX::Nimbus::Config.environmentpath = options[:nimbus_environmentpath]
-    PuppetX::Nimbus::Config.confdir = options[:nimbus_confdir]
+  def set_global_config(user_arguments)
+    # If no arguments are given, for some reason that's not an empty array but
+    # is instead an array with an empty hash in it.
+    user_arguments.delete({})
 
-    options[:argv_configs] = nil unless options[:argv_configs] != [{}]
-    PuppetX::Nimbus::Config.config = [options[:nimbus_config], options[:argv_configs]].flatten.compact
+    PuppetX::Nimbus::Config.environment     = setting_environment
+    PuppetX::Nimbus::Config.environmentpath = setting_environmentpath
+    PuppetX::Nimbus::Config.config          = [user_arguments].flatten.compact
 
     # Make a best-effort to create the working directories if they don't
     # already exist. Note the use of mkdir instead of mkdir_p; this will only
     # work if the parent directories already exist.
-    [ options[:nimbus_environmentpath],
-      options[:nimbus_confdir],
-      File.join(options[:nimbus_environmentpath], options[:nimbus_environment]),
+    [ setting_environmentpath,
+      File.join(setting_environmentpath, setting_environment),
     ].each do |dir|
       FileUtils.mkdir(dir) unless File.exist?(dir)
     end

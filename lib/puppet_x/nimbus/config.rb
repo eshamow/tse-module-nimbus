@@ -8,7 +8,6 @@ module PuppetX
 
       singleton_class.class_eval { attr_accessor :environment }
       singleton_class.class_eval { attr_accessor :environmentpath }
-      singleton_class.class_eval { attr_accessor :confdir }
       singleton_class.class_eval { attr_accessor :config }
 
       def self.[](index)
@@ -21,8 +20,7 @@ module PuppetX
 
       def self.parse_config!
         @data = {:classes => [], :data => {}, :modules => {}}
-        confdir_files = Dir.glob("#{@confdir}/*.conf")
-        [confdir_files, @config].flatten.compact.each do |file|
+        @config.each do |file|
           new_data = Hocon::ConfigFactory.parse_file(file).root.unwrapped
           @data[:classes] << new_data['classes']      if new_data['classes']
           @data[:data].merge!(new_data['data'])       if new_data['data']
