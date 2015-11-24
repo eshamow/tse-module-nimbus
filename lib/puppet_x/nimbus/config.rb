@@ -19,6 +19,10 @@ module PuppetX
         @data[index] = value
       end
 
+      def self.config_parsed?
+        @config_parsed == true
+      end
+
       def self.parse_config!
         @data = {:classes => [], :data => {}, :modules => {}}
         @config.each do |location|
@@ -29,6 +33,7 @@ module PuppetX
           @data[:modules].merge!(new_data['modules']) if new_data['modules']
         end
         @data[:classes] = @data[:classes].flatten.uniq
+        @config_parsed = true
       end
     end
   end
