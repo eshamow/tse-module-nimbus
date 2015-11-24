@@ -71,11 +71,19 @@ Puppet::Face.define(:nimbus, '1.0.0') do
   end
 
   def setting_environment
-    'default'
+    if Puppet.settings.set_by_cli?(:environment)
+      Puppet[:environment]
+    else
+      'nimbus'
+    end
   end
 
   def setting_environmentpath
-    File.join(Puppet[:codedir], 'nimbus_environments')
+    if Puppet.settings.set_by_cli?(:environmentpath)
+      Puppet[:environmentpath]
+    else
+      File.join(Puppet[:codedir], 'nimbus_environments')
+    end
   end
 
   def install_all_modules

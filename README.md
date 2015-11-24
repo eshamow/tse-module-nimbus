@@ -82,7 +82,7 @@ After the modules have been configured, use one of:
 
 or
 
-    puppet nimbus apply example.conf --nimbus-environmentpath=/path/to --nimbus-environment=prod
+    puppet nimbus apply example.conf --environmentpath=/path/to --environment=prod
 
 ## Directory structure ##
 
@@ -125,29 +125,3 @@ or
         "version": "1.0.1",
       }
     }
-
-## Options ##
-
-### `--nimbus-config <path>` ###
-
-The path to a Hocon configuration file specifying classes, data, and/or modules
-to use in nimbus configuration.
-
-### `--nimbus-confdir <path>` ###
-
-The path to a directory containing one or more `*.conf` Hocon configuration
-files, each of which may specify classes, data, or modules. All the `*.conf`
-files in this directory will be read, merged, and the result used in nimbus
-configuration.
-
-### `--nimbus-environment <name>` ###
-
-Puppet nimbus uses environments just like Puppet. This flag sets the name of
-the environment the run will use.
-
-### `--nimbus-environmentpath <path>` ###
-
-Puppet nimbus typically uses a subcommand-specific environmentpath. This
-flag allows you to set the path used explicitly. It may be useful if you have
-manually installed modules or created an environment you want the command to
-use.
