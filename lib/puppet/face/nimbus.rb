@@ -29,28 +29,15 @@ Puppet::Face.define(:nimbus, '1.0.0') do
   action :install_modules do
     summary "Install modules specified in given nimbus configuration file(s) in a nimbus environment."
     when_invoked do |*user_arguments, options|
-      nimbus_context(user_arguments) do
-        modules = PuppetX::Nimbus::Config[:modules]
-        modules.each do |name,params|
-          case params['type']
-          when 'forge', nil
-            install_module_using_pmt(name, params, options)
-          when 'tarball'
-            install_module_from_uri(name, params, options)
-          else
-            puts "Error: unable to install #{name} from type #{params['type']}"
-          end
-        end
-      end
+      set_global_config(user_arguments)
+      install_all_modules
       "Done"
     end
   end
 
   action :list_modules do
     when_invoked do |options|
-      nimbus_context do
-        Puppet::Face[:module, '1.0.0'].list(:environment => setting_environment)
-      end
+      list_modules_using_pmt
     end
 
     when_rendering :console do |result|
@@ -63,7 +50,9 @@ Puppet::Face.define(:nimbus, '1.0.0') do
   action :apply do
     summary "Configure the local system using given Puppet all-in-one configuration file(s)."
     when_invoked do |*user_arguments, options|
-      nimbus_context(user_arguments) do
+      set_global_config(user_arguments)
+      install_all_modules unless all_modules_installed?
+      nimbus_context do
         argv = ['--execute', '']
         command_line = Puppet::Util::CommandLine.new('puppet', argv)
         apply = Puppet::Application::Apply.new(command_line)
@@ -87,6 +76,23 @@ Puppet::Face.define(:nimbus, '1.0.0') do
 
   def setting_environmentpath
     File.join(Puppet[:codedir], 'nimbus_environments')
+  end
+
+  def install_all_modules
+    raise "Premature internal method call" unless PuppetX::Nimbus::Config.config_parsed?
+    nimbus_context do
+      modules = PuppetX::Nimbus::Config[:modules]
+      modules.each do |name,params|
+        case params['type']
+        when 'forge', nil
+          install_module_using_pmt(name, params, options)
+        when 'tarball'
+          install_module_from_uri(name, params, options)
+        else
+          puts "Error: unable to install #{name} from type #{params['type']}"
+        end
+      end
+    end
   end
 
   def install_module_from_uri(name, params, options)
@@ -117,6 +123,30 @@ Puppet::Face.define(:nimbus, '1.0.0') do
     end
   end
 
+  def list_modules_using_pmt
+    nimbus_context do
+      Puppet::Face[:module, '1.0.0'].list(:environment => setting_environment)
+    end
+  end
+
+  def all_modules_installed?
+    raise "Premature internal method call" unless PuppetX::Nimbus::Config.config_parsed?
+
+    installed_module_names = []
+    list_modules_using_pmt[:modules_by_path].each do |path|
+      path[1].each do |mod|
+        installed_module_names << mod.name
+        installed_module_names << mod.forge_name
+      end
+    end
+
+    installed_module_names.compact!
+
+    PuppetX::Nimbus::Config[:modules].all? do |name,params|
+      installed_module_names.include?(name)
+    end
+  end
+
   def nimbus_context(user_arguments = [], &block)
 
     set_global_config(user_arguments)
@@ -136,6 +166,7 @@ Puppet::Face.define(:nimbus, '1.0.0') do
   end
 
   def set_global_config(user_arguments)
+    return if PuppetX::Nimbus::Config.config_parsed?
     # If no arguments are given, for some reason that's not an empty array but
     # is instead an array with an empty hash in it.
     user_arguments.delete({})

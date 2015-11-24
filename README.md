@@ -50,6 +50,11 @@ Or:
     puppet nimbus install_modules https://git.io/vZBXu
     puppet nimbus apply https://git.io/vZBXu
 
+Or just:
+
+    puppet module install tse/nimbus
+    puppet nimbus apply https://git.io/vZBXu
+
 > Note on OSX: due to https://tickets.puppetlabs.com/browse/PUP-3450 it is
 > necessary to update root CA bundles used by Puppet to get the module tool
 > working (to install modules). The following can be used to do that:
