@@ -1,6 +1,6 @@
 {
   "name": "tse-nimbus",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": "Puppet Labs TSE Team",
   "license": "Apache-2.0",
   "summary": "Single-system Puppetized configuration utility",
