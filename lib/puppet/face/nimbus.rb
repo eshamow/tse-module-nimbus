@@ -109,6 +109,7 @@ Puppet::Face.define(:nimbus, '1.0.0') do
       file.binmode
       open(params['source']) do |uri|
         file.write(uri.read)
+        file.flush
       end
       install_module_using_pmt(file.path, params, options)
     ensure
