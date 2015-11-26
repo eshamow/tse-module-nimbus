@@ -141,18 +141,18 @@ Puppet::Face.define(:nimbus, '1.0.0') do
   def all_modules_installed?
     raise "Premature internal method call" unless PuppetX::Nimbus::Config.config_parsed?
 
-    installed_module_names = []
-    list_modules_using_pmt[:modules_by_path].each do |path|
-      path[1].each do |mod|
-        installed_module_names << mod.name
-        installed_module_names << mod.forge_name
+    installed = list_modules_using_pmt[:modules_by_path].inject([]) do |outer,path|
+      outer << path[1].inject([]) do |inner,mod|
+        inner << mod
       end
-    end
-
-    installed_module_names.compact!
+    end.flatten
 
     PuppetX::Nimbus::Config[:modules].all? do |name,params|
-      installed_module_names.include?(name)
+      result = installed.detect do |mod|
+        next false unless [mod.name, mod.forge_name].include?(name)
+        next true if params['version'].nil?
+        mod.version == params['version']
+      end
     end
   end
 
