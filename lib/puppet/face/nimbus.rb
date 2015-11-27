@@ -87,23 +87,27 @@ Puppet::Face.define(:nimbus, '1.0.0') do
   end
 
   def install_all_modules
-    raise "Premature internal method call" unless PuppetX::Nimbus::Config.config_parsed?
+    require_config_parsed
     nimbus_context do
       modules = PuppetX::Nimbus::Config[:modules]
       modules.each do |name,params|
-        case params['type']
-        when 'forge', nil
-          install_module_using_pmt(name, params, options)
-        when 'tarball'
-          install_module_from_uri(name, params, options)
-        else
-          puts "Error: unable to install #{name} from type #{params['type']}"
-        end
+        install_module(name, params) unless module_installed?(name,params)
       end
     end
   end
 
-  def install_module_from_uri(name, params, options)
+  def install_module(name, params)
+    case params['type']
+    when 'forge', nil
+      install_module_using_pmt(name, params)
+    when 'tarball'
+      install_module_from_uri(name, params)
+    else
+      puts "Error: unable to install #{name} from type #{params['type']}"
+    end
+  end
+
+  def install_module_from_uri(name, params)
     file = Tempfile.new("#{name.gsub(/(\\|\/)/, '_')}_")
     begin
       file.binmode
@@ -111,14 +115,14 @@ Puppet::Face.define(:nimbus, '1.0.0') do
         file.write(uri.read)
         file.flush
       end
-      install_module_using_pmt(file.path, params, options)
+      install_module_using_pmt(file.path, params)
     ensure
       file.close
       file.unlink
     end
   end
 
-  def install_module_using_pmt(name, params, options)
+  def install_module_using_pmt(name, params)
     install = Puppet::Face[:module, '1.0.0'].install(name,
       :environment => setting_environment,
       :ignore_dependencies => true,
@@ -139,7 +143,7 @@ Puppet::Face.define(:nimbus, '1.0.0') do
   end
 
   def all_modules_installed?
-    raise "Premature internal method call" unless PuppetX::Nimbus::Config.config_parsed?
+    require_config_parsed
 
     installed = list_modules_using_pmt[:modules_by_path].inject([]) do |outer,path|
       outer << path[1].inject([]) do |inner,mod|
@@ -148,12 +152,28 @@ Puppet::Face.define(:nimbus, '1.0.0') do
     end.flatten
 
     PuppetX::Nimbus::Config[:modules].all? do |name,params|
-      result = installed.detect do |mod|
-        next false unless [mod.name, mod.forge_name].include?(name)
-        next true if params['version'].nil?
-        mod.version == params['version']
-      end
+      module_installed?(name, params)
     end
+  end
+
+  def module_installed?(name, params)
+    require_config_parsed
+
+    @installed_modules ||= list_modules_using_pmt[:modules_by_path].inject([]) do |outer,path|
+      outer << path[1].inject([]) do |inner,mod|
+        inner << mod
+      end
+    end.flatten
+
+    @installed_modules.detect do |mod|
+      next false unless [mod.name, mod.forge_name].include?(name)
+      next true if params['version'].nil?
+      mod.version == params['version']
+    end
+  end
+
+  def require_config_parsed
+    raise "Premature internal method call" unless PuppetX::Nimbus::Config.config_parsed?
   end
 
   def nimbus_context(user_arguments = [], &block)
