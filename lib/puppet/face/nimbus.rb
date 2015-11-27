@@ -181,6 +181,7 @@ Puppet::Face.define(:nimbus, '1.0.0') do
     set_global_config(user_arguments)
     Puppet[:node_terminus]         = 'nimbus'
     Puppet[:data_binding_terminus] = 'nimbus'
+    Puppet[:default_file_terminus] = 'file_server'
     Puppet[:environmentpath]       = setting_environmentpath
     Puppet[:environment]           = setting_environment
 
