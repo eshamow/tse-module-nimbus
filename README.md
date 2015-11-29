@@ -23,20 +23,6 @@ file.
 
 New users can get started with a config provided by their company or team.
 
-## Volatility Note ##
-
-This module is in early development and everything is subject to change. That
-includes the module name. This subcommand this module provides has previously
-been called by many other names including `puppet singleton`, `puppet
-workstation`, `puppet solo`, and `puppet aio`. Currently it is called `puppet
-nimbus`, which is intended to be a codename which does not convey any
-particular function other than serving as an identifier.
-
-## Known Issues ##
-
-Puppet code containing file resources with source parameters set to puppet://
-URIs do not work. This is a bug that needs to be resolved in the nimbus module.
-
 ## Examples ##
 
 ### Basic ###
