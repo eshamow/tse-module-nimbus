@@ -10,5 +10,7 @@ class nimbus::test (
     }
   }
 
-  notify { 'nimbus::test': }
+  notify { 'nimbus::test':
+    message => $::static_fact,
+  }
 }

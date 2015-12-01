@@ -7,6 +7,7 @@ class Puppet::Node::Nimbus < Puppet::Indirector::Plain
   def find(request)
     node = Puppet::Node.new(request.key)
     node.classes = PuppetX::Nimbus::Config[:classes]
+    node.parameters = PuppetX::Nimbus::Config[:variables]
     node.fact_merge
     node
   end
