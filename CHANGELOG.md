@@ -1,6 +1,10 @@
 # Change Log
 
-## 0.7.0 (2015-11-28)
+## Unreleased
+
+(intentionally left blank)
+
+## 0.7.0 (2015-11-30)
 
 New Features:
 
