@@ -1,8 +1,14 @@
 # Change Log
 
-## Unreleased
+## 0.7.0 (2015-11-28)
 
-(this space intentionally left blank)
+New Features:
+
+  - Added "variables" key to config file. The variables key can be used to provide static variables which will be available to Puppet in top scope, similar to facts.
+
+Improvements:
+
+  - Added support Hocon config files using substitution. Previously trying to parse a file that contained substitution would cause an error.
 
 ## 0.6.4 (2015-11-28)
 
