@@ -1,8 +1,10 @@
 # Change Log
 
-## Unreleased
+## 0.7.1 (2016-02-16)
 
-(intentionally left blank)
+Bug Fixes:
+
+  - Corrected how hocon gem was being required for compatibility with version 1.0.0 of the gem and newer.
 
 ## 0.7.0 (2015-11-30)
 

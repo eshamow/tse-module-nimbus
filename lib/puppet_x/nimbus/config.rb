@@ -1,5 +1,5 @@
 require 'singleton'
-require 'hocon'
+require 'hocon/config_factory'
 require 'open-uri'
 
 module PuppetX
