@@ -7,7 +7,7 @@
   "source": "https://github.com/puppetlabs/tse-module-nimbus",
   "project_page": "https://github.com/puppetlabs/tse-module-nimbus",
   "dependencies": [
-    { "name": "eshamow/git", "version_requirement": ">= 0.0.1" }
+    { "name": "slalompdx/git", "version_requirement": ">= 0.0.1" }
   ]
   "operatingsystem_support": [
     {
